@@ -1,0 +1,65 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: urban_app_php
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - urban_network
+    depends_on:
+      - mysql
+
+  nginx:
+    image: nginx:alpine
+    container_name: urban_app_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - urban_network
+    depends_on:
+      - app
+
+  mysql:
+    image: mysql:8.0
+    container_name: urban_app_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: urban_app
+      MYSQL_USER: urban_user
+      MYSQL_PASSWORD: secretpassword
+      MYSQL_ROOT_PASSWORD: rootsecretpassword
+    ports:
+      - "3306:3306"
+    volumes:
+      - urban_db_data:/var/lib/mysql
+    networks:
+      - urban_network
+
+  node:
+    image: node:20-alpine
+    container_name: urban_app_node
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - urban_network
+    profiles:
+      - build
+
+networks:
+  urban_network:
+    driver: bridge
+
+volumes:
+  urban_db_data:
+    driver: local
+
