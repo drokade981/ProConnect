@@ -14,6 +14,9 @@
                 {{ config('app.name', 'HunarApp') }}
             </div>
             <nav class="flex items-center gap-4">
+                <a href="{{ route('admin.dashboard') }}" class="rounded-xl px-4 py-2 text-xs font-bold uppercase tracking-wider bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 hover:from-violet-500 hover:via-fuchsia-500 hover:to-pink-500 text-white shadow-lg shadow-fuchsia-600/30 hover:-translate-y-0.5 transition-all">
+                    Admin Console
+                </a>
                 @if (Route::has('login'))
                     @auth
                         <a href="{{ url('/dashboard') }}" class="rounded-md px-4 py-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition">
