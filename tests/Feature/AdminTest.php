@@ -82,4 +82,62 @@ class AdminTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Support Tickets &amp; Disputes', false);
     }
+
+    public function test_navigation_hides_admin_console_from_guest(): void
+    {
+        $response = $this->get('/');
+        $response->assertStatus(200);
+        $response->assertDontSee('Admin Console');
+    }
+
+    public function test_navigation_hides_admin_console_from_end_user(): void
+    {
+        $customer = User::where('role', 'customer')->first();
+        $this->assertNotNull($customer);
+
+        // Check landing page
+        $response = $this->actingAs($customer)->get('/');
+        $response->assertStatus(200);
+        $response->assertDontSee('Admin Console');
+
+        // Check user dashboard
+        $dashResponse = $this->actingAs($customer)->get('/dashboard');
+        $dashResponse->assertStatus(200);
+        $dashResponse->assertDontSee('Admin Console');
+    }
+
+    public function test_navigation_shows_admin_console_to_admin(): void
+    {
+        $admin = User::where('role', 'admin')->first();
+        $this->assertNotNull($admin);
+
+        // Check landing page
+        $response = $this->actingAs($admin)->get('/');
+        $response->assertStatus(200);
+        $response->assertSee('Admin Console');
+
+        // Check dashboard
+        $dashResponse = $this->actingAs($admin)->get('/dashboard');
+        $dashResponse->assertStatus(200);
+        $dashResponse->assertSee('Admin Console');
+    }
+
+    public function test_navigation_shows_admin_console_to_support(): void
+    {
+        $support = User::where('email', 'support@urbanapp.com')->first();
+        if (!$support) {
+            $support = User::create([
+                'full_name' => 'Support Agent',
+                'email' => 'support@urbanapp.com',
+                'phone' => '+919999000000',
+                'password' => bcrypt('password'),
+                'role' => 'support',
+                'status' => 'active',
+            ]);
+        }
+
+        $response = $this->actingAs($support)->get('/dashboard');
+        $response->assertStatus(200);
+        $response->assertSee('Admin Console');
+    }
 }

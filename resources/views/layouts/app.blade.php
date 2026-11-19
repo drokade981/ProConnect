@@ -13,6 +13,9 @@
 
         <!-- Tailwind CSS -->
         <script src="https://cdn.tailwindcss.com"></script>
+
+        <!-- Alpine.js -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased bg-gray-100">
         <div class="min-h-screen">
